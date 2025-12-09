@@ -4,10 +4,13 @@ const adminController = require('../controllers/adminController');
 
 // Motor Management
 router.get('/motor', adminController.lihatDaftarMotor);
-router.get('/motor/:id', adminController.lihatDetailMotor);
 router.post('/motor', adminController.tambahMotor);
+router.get('/motor/deleted', adminController.lihatMotorDihapus); 
+router.get('/motor/:id', adminController.lihatDetailMotor);
 router.put('/motor/:id', adminController.updateMotor);
 router.delete('/motor/:id', adminController.hapusMotor);
+router.delete('/motor/:id/paksa', adminController.hapusMotorPaksa);
+router.put('/motor/restore/:id', adminController.restoreMotor); 
 router.post('/motor/riwayat', adminController.tambahRiwayatMotor);
 
 // Pembayaran Management
@@ -21,5 +24,6 @@ router.put('/transaksi/selesai/:id', adminController.selesaikanTransaksi);
 
 // Laporan
 router.get('/laporan', adminController.lihatLaporanRental);
+
 
 module.exports = router;

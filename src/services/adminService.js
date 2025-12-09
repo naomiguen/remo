@@ -37,23 +37,23 @@ class AdminService {
         const connection = await db.getConnection();
         
         try {
-            // DEBUG
-            console.log('Data:', data);
-            
             await connection.execute(query, [
                 id_motor, plat_motor, merk, tipe, tarif_harian, status
             ]);
             
             const [result] = await connection.execute(selectQuery);
-            
-            // DEBUG
-            console.log('Result:', result[0]);
-            
-            return { success: true, data: result[0] };
+            const message = result[0]?.message;
+
+            if (!message) {
+                return { success: false, error: 'Gagal mendapatkan response dari database' };
+            }
+
+            if (message.startsWith('Error:')) {
+                return { success: false, error: message };
+            }
+
+            return { success: true, data: { message: message } };
         } catch (error) {
-            // DEBUG
-            console.error('Error:', error);
-            
             return { success: false, error: error.message };
         } finally {
             connection.release();
@@ -64,13 +64,54 @@ class AdminService {
     async hapusMotor(idMotor) {
         const query = 'CALL sp_hapus_motor(?, @message)';
         const selectQuery = 'SELECT @message AS message';
-        
+            
         const connection = await db.getConnection();
-        s
+        
         try {
             await connection.execute(query, [idMotor]);
             const [result] = await connection.execute(selectQuery);
-            return { success: true, data: result[0] };
+            
+            const message = result[0]?.message;
+            
+            if (!message) {
+                return { success: false, error: 'Gagal mendapatkan response dari database' };
+            }
+            
+            if (message.startsWith('Error:')) {
+                return { success: false, error: message };
+            }
+            
+            return { success: true, data: { message: message } };
+            
+        } catch (error) {
+            return { success: false, error: error.message };
+        } finally {
+            connection.release();
+        }
+    }
+
+    async hapusMotorPaksa(idMotor) {
+        const query = 'CALL sp_hapus_motor_paksa(?, @message)';
+        const selectQuery = 'SELECT @message AS message';
+            
+        const connection = await db.getConnection();
+        
+        try {
+            await connection.execute(query, [idMotor]);
+            const [result] = await connection.execute(selectQuery);
+            
+            const message = result[0]?.message;
+            
+            if (!message) {
+                return { success: false, error: 'Gagal mendapatkan response dari database' };
+            }
+            
+            if (message.startsWith('Error:')) {
+                return { success: false, error: message };
+            }
+            
+            return { success: true, data: { message: message } };
+            
         } catch (error) {
             return { success: false, error: error.message };
         } finally {
@@ -79,6 +120,51 @@ class AdminService {
     }
 
     
+    async restoreMotor(idMotor) {
+        const query = 'CALL sp_restore_motor(?, @message)';
+        const selectQuery = 'SELECT @message AS message';
+            
+        const connection = await db.getConnection();
+        
+        try {
+            await connection.execute(query, [idMotor]);
+            const [result] = await connection.execute(selectQuery);
+            
+            const message = result[0]?.message;
+            
+            if (!message) {
+                return { success: false, error: 'Gagal mendapatkan response dari database' };
+            }
+            
+            if (message.startsWith('Error:')) {
+                return { success: false, error: message };
+            }
+            
+            return { success: true, data: { message: message } };
+            
+        } catch (error) {
+            return { success: false, error: error.message };
+        } finally {
+            connection.release();
+        }
+    }
+
+    
+    async lihatMotorDihapus() {
+        const query = 'CALL sp_lihat_motor_dihapus()';
+        const connection = await db.getConnection();
+        
+        try {
+            const [rows] = await connection.execute(query);
+            return { success: true, data: rows[0] };
+        } catch (error) {
+            return { success: false, error: error.message };
+        } finally {
+            connection.release();
+        }
+    }
+
+
     async tambahRiwayatMotor(data) {
         const { id_motor, status, keterangan } = data;
         
